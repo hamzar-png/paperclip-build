@@ -1,0 +1,35 @@
+name: build-server
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/build-server.yml'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.21.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile=false
+      - name: Build all (server + Rust runner + UI)
+        run: pnpm build
+        env:
+          PAPERCLIP_MIGRATION_PROMPT: never
+      - name: Package server (self-contained)
+        run: |
+          cd server
+          pnpm deploy --legacy --filter @paperclipai/server --prod pruned
+          cp -R dist pruned/dist
+          tar -czf ../paperclip-server.tar.gz -C pruned .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paperclip-server
+          path: paperclip-server.tar.gz
+          retention-days: 7
