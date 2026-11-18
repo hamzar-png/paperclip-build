@@ -23,6 +23,7 @@ jobs:
         run: pnpm build
         env:
           PAPERCLIP_MIGRATION_PROMPT: never
+          PAPERCLIP_TSC_EMIT_ONLY: "1"
       - name: Package server (self-contained)
         run: |
           cd server
