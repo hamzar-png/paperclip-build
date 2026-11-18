@@ -26,10 +26,9 @@ jobs:
           PAPERCLIP_TSC_EMIT_ONLY: "1"
       - name: Package server (self-contained)
         run: |
-          cd server
-          pnpm deploy --legacy --filter @paperclipai/server --prod pruned
-          cp -R dist pruned/dist
-          tar -czf ../paperclip-server.tar.gz -C pruned .
+          pnpm --filter @paperclipai/server deploy --prod pruned
+          cp -R server/dist pruned/dist
+          tar -czf paperclip-server.tar.gz -C pruned .
       - uses: actions/upload-artifact@v4
         with:
           name: paperclip-server
